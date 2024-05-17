@@ -1,7 +1,34 @@
-export function handler(event) {
-  const todoId = event.pathParameters.todoId
+import middy from '@middy/core';
+import cors from '@middy/http-cors';
+import httpErrorHandler from '@middy/http-error-handler';
+import { generateUploadUrl } from '../../Blogic/todo.mjs';
+import {createLogger} from "../../utils/logger.mjs";
 
-  // TODO: Return a presigned URL to upload a file for a TODO item with the provided id
-  return undefined
+const logger = createLogger(' generateUploadUrl')
+
+const generateUploadUrlHandler = async (event) => {
+  try {
+      const todoId = event.pathParameters.todoId;
+      const url = await generateUploadUrl(todoId);
+      return {
+          statusCode: 200,
+          body: JSON.stringify({
+              uploadUrl: url
+          })
+      };
+  } catch (error) {
+      logger.error(`error: ${error}`)
+      return {
+        statusCode: 500,
+        body: JSON.stringify({
+            message: "Error generating upload URL."
+        })
+    };
 }
+};
 
+export const handler = middy(generateUploadUrlHandler)
+    .use(httpErrorHandler())
+    .use(cors({
+        credentials: true
+    }));

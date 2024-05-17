@@ -4,7 +4,15 @@ import { createLogger } from '../../utils/logger.mjs'
 
 const logger = createLogger('auth')
 
-const jwksUrl = 'https://test-endpoint.auth0.com/.well-known/jwks.json'
+const jwksUrl = 'https://dev-ihi34x4bcw3plrdr.us.auth0.com/.well-known/jwks.json'
+
+async function getPublickey() {
+  const response = await Axios.get(jwksUrl)
+  const key = response.data.keys[0].x5c[0] // get public key form jwks
+  
+  return  `==========================CERTIFICATE==========================\n${key}\n==========================CERTIFICATE==========================`
+
+}
 
 export async function handler(event) {
   try {
@@ -44,10 +52,15 @@ export async function handler(event) {
 
 async function verifyToken(authHeader) {
   const token = getToken(authHeader)
-  const jwt = jsonwebtoken.decode(token, { complete: true })
-
-  // TODO: Implement token verification
-  return undefined;
+  try {
+    const publicKey = await getPublicKey()
+    const decoded = jsonwebtoken.verify(token, publicKey, { algorithms: ['RS256'] })
+    logger.info(`verifyToken - decoded ${decoded}`)
+    return decoded // this is payload decoded include sub
+  } catch (error) {
+    logger.error('Error verifying token', { error: error.message })
+    throw new Error('Token is invalid')
+  }
 }
 
 function getToken(authHeader) {
@@ -55,9 +68,10 @@ function getToken(authHeader) {
 
   if (!authHeader.toLowerCase().startsWith('bearer '))
     throw new Error('Invalid authentication header')
-
   const split = authHeader.split(' ')
   const token = split[1]
+  logger.info(`getToken - authHeader ${authHeader}`)
+  logger.info(`getToken - token ${token}`)
 
   return token
 }
