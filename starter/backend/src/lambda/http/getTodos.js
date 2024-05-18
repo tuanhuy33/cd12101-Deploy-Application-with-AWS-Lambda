@@ -1,7 +1,7 @@
 import middy from '@middy/core';
 import cors from '@middy/http-cors';
 import httpErrorHandler from '@middy/http-error-handler';
-import { getTodosForUser } from '../../Blogic/todo.mjs';
+import { getTodosForUser } from '../../businessLogic/todo.mjs';
 import { getUserId } from '../utils.mjs';
 import {createLogger} from "../../utils/logger.mjs";
 
@@ -22,6 +22,7 @@ const getTodosHandler = async (event) => {
         };
     } catch (error) {
         logger.info(`error: ${error}`)
+
         return {
             statusCode: 500,
             body: JSON.stringify({
@@ -35,4 +36,4 @@ export const handler = middy(getTodosHandler)
     .use(httpErrorHandler())
     .use(cors({
         credentials: true
-}));
+    }));

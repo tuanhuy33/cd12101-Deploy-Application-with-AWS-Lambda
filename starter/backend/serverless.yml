@@ -1,5 +1,3 @@
-org: huybt2
-app: serverless-todo-app
 service: serverless-todo-app
 
 plugins:
@@ -18,14 +16,14 @@ provider:
   environment:
     TODOS_TABLE: Todos-${self:provider.stage}
     TODOS_CREATED_AT_INDEX: CreatedAtIndex
-    S3_BUCKET: huybt-bucket-${self:provider.stage}
+    S3_BUCKET: huybt2-bucket-${self:provider.stage}
+
 
 functions:
-
   Auth:
     handler: src/lambda/auth/auth0Authorizer.handler
 
-  # TODO: Configure getTodos function
+# TODO: Configure getTodos function
   GetTodos:
     handler: src/lambda/http/getTodos.handler
     events:
@@ -34,9 +32,6 @@ functions:
           path: todos
           cors: true
           authorizer: Auth
-          request:
-            schemas:
-              application/json: ${file(src/schema-create-todo.json)}
     iamRoleStatementsInherit: true
     iamRoleStatements:
       - Effect: Allow
@@ -51,9 +46,11 @@ functions:
         Action:
           - "xray:PutTraceSegments"
           - "xray:PutTelemetryRecords"
-        Resource: "*"
+        Resource: 
+           - "*"
 
-  CreateTodo:
+# TODO: Configure CreateTodos function
+ CreateTodo:
     handler: src/lambda/http/createTodo.handler
     events:
       - http:
@@ -61,6 +58,9 @@ functions:
           path: todos
           cors: true
           authorizer: Auth
+          request:
+            schemas:
+              application/json: ${file(src/schema/create-todo-schema.json)}
     iamRoleStatementsInherit: true
     iamRoleStatements:
       - Effect: Allow
@@ -74,10 +74,10 @@ functions:
         Action:
           - "xray:PutTraceSegments"
           - "xray:PutTelemetryRecords"
-        Resource: "*" 
+        Resource: "*"
 
-
-  UpdateTodo:
+# TODO: Configure UpdateTodos function
+   UpdateTodo:
     handler: src/lambda/http/updateTodo.handler
     events:
       - http:
@@ -87,7 +87,7 @@ functions:
           authorizer: Auth
           request:
             schemas:
-              application/json: ${file(src/schema-update-todo.json)}
+              application/json: ${file(src/schema/update-todo-schema.json)}
     iamRoleStatementsInherit: true
     iamRoleStatements:
       - Effect: Allow
@@ -104,6 +104,7 @@ functions:
         Resource: "*"
 
 
+# TODO: Configure DeleteTodos function
   DeleteTodo:
     handler: src/lambda/http/deleteTodo.handler
     events:
@@ -116,7 +117,7 @@ functions:
     iamRoleStatements:
       - Effect: Allow
         Action:
-             - "dynamodb:DeleteItem"
+          - "dynamodb:DeleteItem"
         Resource:
           - "arn:aws:dynamodb:${self:provider.region}:${aws:accountId}:table/${self:provider.environment.TODOS_TABLE}"
           - "arn:aws:dynamodb:${self:provider.region}:${aws:accountId}:table/${self:provider.environment.TODOS_TABLE}/index/*"
@@ -124,9 +125,10 @@ functions:
         Action:
           - "xray:PutTraceSegments"
           - "xray:PutTelemetryRecords"
-        Resource: "*"
+        Resource:
+          - "*"
 
-
+  # TODO: Configure GenerateUploadUrl
   GenerateUploadUrl:
     handler: src/lambda/http/generateUploadUrl.handler
     events:
@@ -137,19 +139,26 @@ functions:
           authorizer: Auth
     iamRoleStatementsInherit: true
     iamRoleStatements:
-        - Effect: Allow
-          Action:
-            - dynamodb:GetItem
-            - dynamodb:UpdateItem
-            - dynamodb:PutItem
-          Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
-        - Effect: "Allow"
-          Action:
-            - "xray:PutTraceSegments"
-            - "xray:PutTelemetryRecords"
-          Resource: "*"
-
-
+      - Effect: Allow
+        Action:
+          - s3:PutObject
+          - s3:GetObject
+        Resource: arn:aws:s3:::${self:provider.environment.S3_BUCKET}/*
+      - Effect: Allow
+        Action:
+          - "dynamodb:GetItem"
+          - "dynamodb:UpdateItem"
+          - "dynamodb:PutItem"
+        Resource:
+          - "arn:aws:dynamodb:${self:provider.region}:${aws:accountId}:table/${self:provider.environment.TODOS_TABLE}"
+          - "arn:aws:dynamodb:${self:provider.region}:${aws:accountId}:table/${self:provider.environment.TODOS_TABLE}/index/*"
+      - Effect: "Allow"
+        Action:
+          - "xray:PutTraceSegments"
+          - "xray:PutTelemetryRecords"
+        Resource: 
+          - "*"
+# TODO: Configure resources AWS 
 resources:
   Resources:
     GatewayResponse:
@@ -189,9 +198,9 @@ resources:
               - AttributeName: createdAt
                 KeyType: RANGE
             Projection:
-              ProjectionType: ALL
+              ProjectionType: ALL 
 
-    S3Bucket:
+    ImageS3Bucket:
       Type: 'AWS::S3::Bucket'
       Properties:
         BucketName: ${self:provider.environment.S3_BUCKET}
@@ -212,7 +221,6 @@ resources:
                 - '*'
               MaxAge: 3600
 
-
     BucketPolicy:
       Type: AWS::S3::BucketPolicy
       Properties:
@@ -225,4 +233,5 @@ resources:
               Principal: '*'
               Action: 's3:GetObject'
               Resource: 'arn:aws:s3:::${self:provider.environment.S3_BUCKET}/*'
-        Bucket: !Ref S3Bucket
+        Bucket: !Ref ImageS3Bucket
+

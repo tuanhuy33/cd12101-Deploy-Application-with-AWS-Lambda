@@ -1,9 +1,10 @@
 import middy from '@middy/core';
 import cors from '@middy/http-cors';
 import httpErrorHandler from '@middy/http-error-handler';
-import { updateTodoForUser } from '../../Blogic/todo.mjs';
+import { updateTodoForUser } from '../../businessLogic/todo.mjs';
 import { getUserId } from '../utils.mjs';
 import {createLogger} from "../../utils/logger.mjs";
+
 const logger = createLogger(' updateTodo')
 
 const updateTodoHandler = async (event) => {
@@ -34,4 +35,4 @@ export const handler = middy(updateTodoHandler)
     .use(httpErrorHandler())
     .use(cors({
         credentials: true
-}));
+    }));

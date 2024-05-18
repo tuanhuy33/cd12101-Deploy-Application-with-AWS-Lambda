@@ -6,12 +6,10 @@ const logger = createLogger('auth')
 
 const jwksUrl = 'https://dev-ihi34x4bcw3plrdr.us.auth0.com/.well-known/jwks.json'
 
-async function getPublickey() {
+async function getPublicKey() {
   const response = await Axios.get(jwksUrl)
-  const key = response.data.keys[0].x5c[0] // get public key form jwks
-  
-  return  `==========================CERTIFICATE==========================\n${key}\n==========================CERTIFICATE==========================`
-
+  const key = response.data.keys[0].x5c[0] // get public key from JWKS response
+  return `-----BEGIN CERTIFICATE-----\n${key}\n-----END CERTIFICATE-----`
 }
 
 export async function handler(event) {
@@ -52,11 +50,12 @@ export async function handler(event) {
 
 async function verifyToken(authHeader) {
   const token = getToken(authHeader)
+
   try {
     const publicKey = await getPublicKey()
     const decoded = jsonwebtoken.verify(token, publicKey, { algorithms: ['RS256'] })
     logger.info(`verifyToken - decoded ${decoded}`)
-    return decoded // this is payload decoded include sub
+    return decoded
   } catch (error) {
     logger.error('Error verifying token', { error: error.message })
     throw new Error('Token is invalid')

@@ -1,7 +1,8 @@
-import { TodosAccess } from '../dataLayer/todoAccess.mjs';
+    import { TodosAccess } from '../dataLayer/todosAccess.mjs';
+import { v4 as uuidv4 } from 'uuid';
 
 export const createTodo = async (userId, newTodo) => {
-    const todoId = uuid.v4();
+    const todoId = uuidv4();
     const createdAt = new Date().toISOString();
 
     const todoItem = {
@@ -27,6 +28,6 @@ export const deleteTodoForUser = async (userId, todoId) => {
     await TodosAccess.deleteTodo(userId, todoId);
 };
 
-export const generateUploadUrl = async (todoId) => {
-    return await TodosAccess.getUploadUrl(todoId);
+export const generateUploadUrl = async (todoId, userId) => {
+    return await TodosAccess.getUploadUrl(todoId, userId);
 };
