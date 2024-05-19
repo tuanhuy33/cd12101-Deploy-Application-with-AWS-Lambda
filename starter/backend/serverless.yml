@@ -22,7 +22,6 @@ provider:
 functions:
   Auth:
     handler: src/lambda/auth/auth0Authorizer.handler
-
 # TODO: Configure getTodos function
   GetTodos:
     handler: src/lambda/http/getTodos.handler
@@ -46,11 +45,9 @@ functions:
         Action:
           - "xray:PutTraceSegments"
           - "xray:PutTelemetryRecords"
-        Resource: 
-           - "*"
-
+        Resource: "*"
 # TODO: Configure CreateTodos function
- CreateTodo:
+  CreateTodo:
     handler: src/lambda/http/createTodo.handler
     events:
       - http:
@@ -60,7 +57,7 @@ functions:
           authorizer: Auth
           request:
             schemas:
-              application/json: ${file(src/schema/create-todo-schema.json)}
+              application/json: ${file(src/schema/schema-create-todo.json)}
     iamRoleStatementsInherit: true
     iamRoleStatements:
       - Effect: Allow
@@ -75,9 +72,8 @@ functions:
           - "xray:PutTraceSegments"
           - "xray:PutTelemetryRecords"
         Resource: "*"
-
-# TODO: Configure UpdateTodos function
-   UpdateTodo:
+  # TODO: Configure UpdateTodos function
+  UpdateTodo:
     handler: src/lambda/http/updateTodo.handler
     events:
       - http:
@@ -87,7 +83,7 @@ functions:
           authorizer: Auth
           request:
             schemas:
-              application/json: ${file(src/schema/update-todo-schema.json)}
+              application/json: ${file(src/schema/schema-update-todo.json)}
     iamRoleStatementsInherit: true
     iamRoleStatements:
       - Effect: Allow
@@ -102,9 +98,7 @@ functions:
           - "xray:PutTraceSegments"
           - "xray:PutTelemetryRecords"
         Resource: "*"
-
-
-# TODO: Configure DeleteTodos function
+  # TODO: Configure DeleteTodos function
   DeleteTodo:
     handler: src/lambda/http/deleteTodo.handler
     events:
@@ -127,7 +121,6 @@ functions:
           - "xray:PutTelemetryRecords"
         Resource:
           - "*"
-
   # TODO: Configure GenerateUploadUrl
   GenerateUploadUrl:
     handler: src/lambda/http/generateUploadUrl.handler
@@ -171,8 +164,6 @@ resources:
         ResponseType: DEFAULT_4XX
         RestApiId:
           Ref: ApiGatewayRestApi
-
-
     TodosTable:
       Type: AWS::DynamoDB::Table
       Properties:
@@ -199,6 +190,7 @@ resources:
                 KeyType: RANGE
             Projection:
               ProjectionType: ALL 
+
 
     ImageS3Bucket:
       Type: 'AWS::S3::Bucket'

@@ -96,6 +96,7 @@ export function Todos() {
         audience: `https://${domain}/api/v2/`,
         scope: 'write:todo'
       })
+      console.log(todo.name, todo.dueDate)
       await patchTodo(accessToken, todo.todoId, {
         name: todo.name,
         dueDate: todo.dueDate,

@@ -7,16 +7,17 @@ import {createLogger} from "../../utils/logger.mjs";
 
 const logger = createLogger('createTodo')
 
+
 const createTodoHandler = async (event) => {
     try {
         const userId = getUserId(event);
         const newTodo = JSON.parse(event.body);
-        const createdTodo = await createTodo(userId, newTodo);
+        const createdTodo = await createTodo(newTodo, userId);
         return {
             statusCode: 201,
             body: JSON.stringify({
                 item: createdTodo
-            })
+            })  
         };
     } catch (error) {
         logger.error(`error: ${error}`)

@@ -24,6 +24,7 @@ export const TodosAccess = {
     },
 
     async createTodo(todoItem) {
+        console.log("aaaaaaaa"+todoItem)
         await docClient.put({
             TableName: todosTable,
             Item: todoItem

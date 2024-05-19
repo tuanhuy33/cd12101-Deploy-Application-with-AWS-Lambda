@@ -1,4 +1,4 @@
-    import { TodosAccess } from '../dataLayer/todosAccess.mjs';
+    import { TodosAccess } from '../dataLayer/todoAccess.mjs';
 import { v4 as uuidv4 } from 'uuid';
 
 export const createTodo = async (userId, newTodo) => {

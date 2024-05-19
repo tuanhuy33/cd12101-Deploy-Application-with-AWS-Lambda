@@ -17,6 +17,14 @@ export async function getTodos(idToken) {
 }
 
 export async function createTodo(idToken, newTodo) {
+  console.log(idToken)
+  console.log( JSON.stringify(newTodo),
+  {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${idToken}`
+    }
+  })
   const response = await Axios.post(
     `${process.env.REACT_APP_API_ENDPOINT}/todos`,
     JSON.stringify(newTodo),
@@ -26,7 +34,18 @@ export async function createTodo(idToken, newTodo) {
         Authorization: `Bearer ${idToken}`
       }
     }
-  )
+  ).then(function(response){
+
+    console.log(response)
+
+  }).catch(error => {
+
+    console.error('error request:', error);
+    console.error('Error stack:', error.stack);
+
+  }).finally(function(){
+
+  });
   return response.data.item
 }
 
