@@ -34,18 +34,7 @@ export async function createTodo(idToken, newTodo) {
         Authorization: `Bearer ${idToken}`
       }
     }
-  ).then(function(response){
-
-    console.log(response)
-
-  }).catch(error => {
-
-    console.error('error request:', error);
-    console.error('Error stack:', error.stack);
-
-  }).finally(function(){
-
-  });
+  )
   return response.data.item
 }
 

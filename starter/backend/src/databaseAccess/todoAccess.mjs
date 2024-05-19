@@ -2,14 +2,16 @@ import { DynamoDB } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocument } from '@aws-sdk/lib-dynamodb';
 import { getUploadUrl } from '../fileStorage/attachmentUtils.mjs';
 import AWSXRay from 'aws-xray-sdk-core';
+import {createLogger} from "../utils/logger.mjs";
 
+const logger = createLogger('createTodo')
 const ddbClient = AWSXRay.captureAWSv3Client(new DynamoDB({ region: 'us-east-1' }));
 const docClient = DynamoDBDocument.from(ddbClient);
 const todosTable = process.env.TODOS_TABLE;
 const todosCreatedAtIndex = process.env.TODOS_CREATED_AT_INDEX;
 
-export const TodosAccess = {
-    async getAllTodos(userId) {
+export const TodoAccesss = {
+    async getAll(userId) {
         const result = await docClient.query({
             TableName: todosTable,
             IndexName: todosCreatedAtIndex,
@@ -24,7 +26,8 @@ export const TodosAccess = {
     },
 
     async createTodo(todoItem) {
-        console.log("aaaaaaaa"+todoItem)
+       // logger.info(`todoItem: ${JSON.parse(todoItem)}`)
+        logger.info(`todoItem: ${todoItem.userId.constructor.name}`)
         await docClient.put({
             TableName: todosTable,
             Item: todoItem
@@ -52,6 +55,7 @@ export const TodosAccess = {
         });
         return updatedTodo;
     },
+
 
     async deleteTodo(userId, todoId) {
         await docClient.delete({

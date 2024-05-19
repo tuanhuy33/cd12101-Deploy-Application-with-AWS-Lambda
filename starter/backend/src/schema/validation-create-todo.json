@@ -11,6 +11,6 @@
       "format": "date"
     }
   },
-  "required": ["name", "due-date"],
+  "required": ["name", "dueDate"],
   "additionalProperties": false
 }

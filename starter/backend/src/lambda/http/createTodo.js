@@ -5,6 +5,7 @@ import { createTodo } from '../../businessLogic/todo.mjs';
 import { getUserId } from '../utils.mjs';
 import {createLogger} from "../../utils/logger.mjs";
 
+
 const logger = createLogger('createTodo')
 
 
@@ -12,7 +13,9 @@ const createTodoHandler = async (event) => {
     try {
         const userId = getUserId(event);
         const newTodo = JSON.parse(event.body);
-        const createdTodo = await createTodo(newTodo, userId);
+        logger.info(  newTodo)
+        logger.info(userId)
+        const createdTodo = await createTodo(userId, newTodo);
         return {
             statusCode: 201,
             body: JSON.stringify({
